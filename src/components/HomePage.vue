@@ -1,4 +1,8 @@
 <template>
+<div>
+  <div class="header">
+    <h1>Basic Calculator</h1>
+  </div>
   <div class="calculator">
     <div class="history"></div>
       <div class="screen">
@@ -45,6 +49,7 @@
       </div>
     <ul style="display:none" class="history-list"></ul>
   </div>
+</div>
 </template>
 
 <script>

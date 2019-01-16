@@ -26,4 +26,11 @@ export default {
   display: flex;
   justify-content: center;
 }
+.header {
+  height: 50px;
+  width: 100%;
+}
+.content {
+  width: 100%;
+}
 </style>
