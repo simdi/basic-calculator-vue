@@ -6,19 +6,19 @@
   <div class="calculator">
     <div class="history"></div>
       <div class="screen">
-        <span class="last">{{ calExpression }}</span>
+        <span class="last">{{ calcExpression }}</span>
         <span class="total">{{ total }}</span>
       </div>
       <div class="keys-btn">
         <div class="clearfix">
           <button class="calc_his imp" value="H">HIS</button>
-          <button class="calc_cls imp" value="&#x21bb;" >&#x21bb;</button>
+          <button class="calc_cls imp" value="&#x21bb;" @click="onClickReset();">&#x21bb;</button>
           <button class="calc_op imp"></button>
-          <button class="calc_bac imp" value="&larr;" @click="onClickDelete()">&larr;</button>
+          <button class="calc_bac imp" value="&larr;" @click="onClickBackspace()">&larr;</button>
         </div>
         <div class="clearfix">
-          <button class="calc_cls imp" value="C" @click="onClickCalculateInt('C')">C</button>
-          <button class="calc_his imp" value="H" @click="onClickCalculateInt('()')">()</button>
+          <button class="calc_cls imp" value="C">C</button>
+          <button class="calc_his imp" value="H">()</button>
           <button class="calc_bac imp" value="%" @click="onClickCalculateInt('%')">%</button>
           <button class="calc_op imp" value="/" @click="onClickCalculateInt('/')">&divide;</button>
         </div>
@@ -43,7 +43,8 @@
         <div class="clearfix">
           <button class="calc_dec" value="." @click="onClickCalculateInt('.')">.</button>
           <button class="calc_int" value="0" @click="onClickCalculateInt(0)">0</button>
-          <button class="calc_neg" value="-/+" @click="onClickCalculateInt('&plusmn;')">+/-</button>
+          <!-- <button class="calc_neg" value="-/+" @click="onClickCalculateInt('&plusmn;')">+/-</button> -->
+          <button class="calc_neg" value="-/+">+/-</button>
           <button class="calc_eval" value="=" @click="onClickCalculateInt('=')">=</button>
         </div>
       </div>
@@ -57,52 +58,47 @@ export default {
   data() {
     return {
       total: 0,
-      isAnInt: false,
-      isAnOperator: false,
-      prevValue: 0,
-      prevOperator: '',
-      calExpression: ''
+      calcExpression: ''
     }
   },
   methods: {
     onClickCalculateInt(value) {
-      if (value !== '=') {
-        this.calExpression = this.calExpression.concat(value);
-      }
+      this.total = 0;
 
-      if (Number.isInteger(value)) {
-        if (this.isAnOperator) {
-          this.total = this.prevValue;
-          this.prevValue = value;
-          this.isAnOperator = false;
-        } else {
-          this.prevValue = parseInt('' + this.prevValue + value);
+      if (value === '=') {
+        // If last character is an operator, remove it before evalulating.
+        const lastChar = this.calcExpression[this.calcExpression.length-1];
+        const remainingString = this.calcExpression.substring(0, this.calcExpression.length-1);
+        if (isNaN(lastChar)) {
+          this.calcExpression = remainingString;
         }
+
+        this.total = eval(this.calcExpression);
+        this.calcExpression = '';
       } else {
-        if (value === '=') {
-          if (this.prevOperator === '+') {
-            this.total += this.prevValue;
-          } else if (this.prevOperator === '-') {
-            this.total -= this.prevValue;
-          } else if (this.prevOperator === '*') {
-            this.total *= this.prevValue;
-          } else if (this.prevOperator === '%') {
-            this.total %= this.prevValue;
-          }
-
-          this.calExpression = '';
-          this.prevValue = 0;
+        // If last character is an operator, replace it with the current operator
+        const lastChar = this.calcExpression[this.calcExpression.length-1];
+        if (isNaN(lastChar) && isNaN(value)) {
+          const remainingString = this.calcExpression.substring(0, this.calcExpression.length-1);
+          this.calcExpression = remainingString;
+          this.calcExpression += '' + value;
         } else {
-          this.isAnOperator = true;
-          this.prevOperator = value;
+          this.calcExpression += '' + value;
         }
       }
     },
-    checkAndDisplayAfterIsOperator(op, value) {
-
+    formatcalcExpression(value) {
+      return Number(value).toLocaleString('en');
     },
-    onClickDelete() {
-      console.log('Delete');
+    onClickReset() {
+      this.total = 0;
+      this.prevValue = 0;
+      this.calcExpression = '';
+    },
+    onClickBackspace() {
+      if (this.calcExpression.length > 0) {
+        this.calcExpression = this.calcExpression.substring(0, this.calcExpression.length - 1);
+      }
     }
   },
 };
